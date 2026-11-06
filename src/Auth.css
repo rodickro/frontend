@@ -1,0 +1,143 @@
+
+/* Estilos compartidos de Login y Register */
+
+/* Fondo y centrado del formulario */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background: #f3f6fc;
+}
+
+/* Tarjeta principal */
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 36px;
+  background: #ffffff;
+  border: 1px solid #e8edf5;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(30, 45, 80, 0.08);
+}
+
+/* Encabezados */
+.auth-card h1 {
+  margin: 0 0 10px;
+  color: #17243b;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.auth-card h2 {
+  margin: 0 0 30px;
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 400;
+  text-align: center;
+}
+
+/* Formulario */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-field label {
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Campos de entrada */
+.auth-input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #d9e1ec;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17243b;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Botón principal */
+.auth-button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 6px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.auth-button:hover {
+  background: #1d4ed8;
+}
+
+.auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Enlaces inferiores */
+.auth-footer {
+  margin-top: 26px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.auth-footer a {
+  display: inline-block;
+  margin-top: 8px;
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Mensajes */
+.auth-error {
+  margin-top: 16px;
+  color: #dc2626;
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-success {
+  margin-top: 16px;
+  color: #15803d;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Adaptación para celulares */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 30px 22px;
+  }
+}
