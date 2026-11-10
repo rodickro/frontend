@@ -13,7 +13,7 @@
     "axios": "^1.21.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-router-dom": "^7.18.5"
+    "react-router": "^8.5.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

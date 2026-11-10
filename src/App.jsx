@@ -1,24 +1,33 @@
 
-import './App.css'
-import LoginPage from './pages/LoginPage.jsx'
-import RegisterPage from './pages/RegisterPage.jsx'
+import { Routes, Route, Navigate } from 'react-router';
 
-import PrincipalPage from './pages/PrincipalPage.jsx'
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
-
+import LoginPage from './pages/LoginPage.jsx';
+import RegisterPage from './pages/RegisterPage.jsx';
 
 function App() {
-
-
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<PrincipalPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
-    </Router>
-  )
+    <Routes>
+      {/* Página de inicio de sesión */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Página de registro */}
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* Temporal: aquí conectaremos la página de Jeanpiere */}
+      <Route
+        path="/"
+        element={
+          <div style={{ textAlign: 'center', marginTop: '60px' }}>
+            <h1>Página principal</h1>
+            <p>Pendiente de integrar el catálogo.</p>
+          </div>
+        }
+      />
+
+      {/* Si la dirección no existe, regresar al Login */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
