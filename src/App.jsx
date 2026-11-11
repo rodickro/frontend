@@ -1,122 +1,95 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [cartCount, setCartCount] = useState(0);
+  
+  // 1. Creamos un estado para guardar los productos que vengan del backend
+  const [productos, setProductos] = useState([]);
+
+  const handleAgregarCarrito = () => {
+    setCartCount(cartCount + 1);
+  };
+
+  // 2. Usamos useEffect y fetch para conectar con tu backend (Requisito del Ticket 3)
+  useEffect(() => {
+    fetch('http://localhost:3001/ecommer/principal')
+      .then(res => res.json())
+      .then(data => {
+        setProductos(data); // Guardamos la data (aunque por ahora sea un arreglo vacío [])
+      })
+      .catch(error => console.error("Error al traer productos:", error));
+  }, []); // El arreglo vacío [] asegura que esto se ejecute solo una vez al cargar la página
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+      <header className="navbar">
+        <div className="navbar-brand">MiTienda</div>
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+          <input type="text" className="search-bar" placeholder="Buscar productos..." />
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+        <nav className="nav-links">
+          <a href="#">Contacto</a>
+          <a href="#">Términos</a>
+          <a href="#">Ayuda</a>
+          <a href="#" className="cart-link">🛒 <span className="cart-badge">{cartCount}</span></a>
+          <a href="#" className="btn-ingresar">Ingresar</a>
+        </nav>
+      </header>
 
-      <div className="ticks"></div>
+      <main className="main-container">
+        <aside className="sidebar">
+          <h3>Filtros</h3>
+          <div className="filter-group">
+            <h4>Categoría</h4>
+            <label className="custom-radio"><input type="radio" name="categoria" defaultChecked /> <span>Todos</span></label>
+            <label className="custom-radio"><input type="radio" name="categoria" /> <span>Calzado</span></label>
+            <label className="custom-radio"><input type="radio" name="categoria" /> <span>Ropa</span></label>
+            <label className="custom-radio"><input type="radio" name="categoria" /> <span>Accesorios</span></label>
+            <label className="custom-radio"><input type="radio" name="categoria" /> <span>Hogar</span></label>
+            <label className="custom-radio"><input type="radio" name="categoria" /> <span>Otros</span></label>
+          </div>
+        </aside>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <section className="catalog">
+          <div className="catalog-header">
+            <div>
+              <h2>Catálogo de Productos</h2>
+              <p>Encuentra lo que necesitas, al mejor precio.</p>
+            </div>
+            <div className="sort-by">
+              <label>Ordenar por: </label>
+              <select>
+                <option>Más vendidos</option>
+                <option>Precio: menor a mayor</option>
+                <option>Precio: mayor a menor</option>
+                <option>Más recientes</option>
+              </select>
+            </div>
+          </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+          <div className="product-grid">
+            {/* 3. Lógica para mostrar productos o un mensaje si está vacío */}
+            {productos.length === 0 ? (
+              <p>No hay productos disponibles por el momento.</p>
+            ) : (
+              productos.map((producto, index) => (
+                <div className="product-card" key={index}>
+                  <div className="product-image-placeholder">Imagen</div>
+                  <h3 className="product-title">{producto.nombre}</h3>
+                  <p className="product-price">S/ {producto.precio}</p>
+                  <div className="product-actions">
+                    <button className="btn-agregar" onClick={handleAgregarCarrito}>Agregar</button>
+                    <button className="btn-detalles">Ver detalles</button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      </main>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
