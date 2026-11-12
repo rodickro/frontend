@@ -91,3 +91,151 @@
   cursor: pointer; flex: 1; font-weight: bold; transition: 0.2s;
 }
 .btn-detalles:hover { background-color: #f0f8ff; }
+
+/* =========================================
+   ESTILOS PARA FILTROS
+   ========================================= */
+
+/* Acordeones */
+.filter-section {
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+  margin-bottom: 5px;
+}
+.filter-section summary {
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #333;
+  margin-bottom: 10px; /* Separación entre el título y las opciones */
+}
+/* Flechita animada del acordeón */
+.filter-section summary::after {
+  content: '▼';
+  font-size: 10px;
+  color: #888;
+  transition: transform 0.3s ease;
+}
+.filter-section[open] summary::after {
+  transform: rotate(180deg);
+}
+
+/* Lista con Scroll para filtros largos (Categoría y Marca) */
+.filter-list {
+  max-height: 140px; 
+  overflow-y: auto;  
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Más separación vertical entre las opciones */
+  padding-right: 5px;
+  padding-bottom: 10px;
+}
+
+/* Scrollbar elegante */
+.filter-list::-webkit-scrollbar { width: 4px; }
+.filter-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+/* Estilo para las listas largas */
+.custom-radio {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #555;
+  font-size: 14px;
+}
+.custom-radio input {
+  display: none; /* Oculta el círculo azul feo por defecto */
+}
+.custom-radio span::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border: 1px solid #aaa;
+  border-radius: 50%;
+  vertical-align: middle;
+  transition: all 0.2s;
+}
+.custom-radio input:checked + span {
+  font-weight: 600;
+  color: #0056b3;
+}
+.custom-radio input:checked + span::before {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  box-shadow: inset 0 0 0 3px white; /* Efecto de círculo seleccionado interior */
+}
+
+
+/* Chips para filtros cortos (Género y Talla) */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Separación más amplia entre chips */
+  padding-bottom: 10px; /* Espacio extra abajo para que Unisex no se pegue al borde */
+}
+.chip-label {
+    display: inline-block; /* Asegura que el chip respete sus márgenes */
+}
+.chip-label input {
+  display: none; 
+}
+.chip-label span {
+  padding: 8px 16px; /* Botones ligeramente más grandes */
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  display: block; 
+}
+
+/* Cuando el chip es seleccionado */
+.chip-label input:checked + span {
+  background-color: #0056b3;
+  color: white;
+  border-color: #0056b3;
+}
+.chip-label:hover span {
+  border-color: #0056b3;
+}
+
+/* =========================================
+   ESTILOS PARA BOTÓN LIMPIAR Y MENSAJE VACÍO
+   ========================================= */
+
+/* Botón Limpiar Filtros */
+.btn-limpiar {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  color: #333;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-limpiar:hover {
+  background-color: #e2e6ea;
+  border-color: #ccc;
+}
+
+/* Mensaje de "No hay productos" centrado */
+.no-products-msg {
+  grid-column: 1 / -1; /* Ocupa todo el ancho disponible */
+  text-align: center;
+  padding: 50px 20px;
+  color: #666;
+  font-size: 16px;
+  background-color: #fdfdfd;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+}
