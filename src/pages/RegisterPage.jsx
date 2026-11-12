@@ -1,47 +1,53 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import '../Auth.css';
 
 const API = 'http://localhost:3001/ecommer';
 
 function RegisterPage() {
+  const navigate = useNavigate();
+
   const [correo, setCorreo] = useState('');
   const [contraseña, setContraseña] = useState('');
-  const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
 
-  // Enviar los datos del registro al backend
+  // Registrar usuario utilizando el backend de Rodick
   const registrarUsuario = async (e) => {
     e.preventDefault();
 
-    setMensaje('');
     setError('');
     setCargando(true);
 
     try {
       const respuesta = await fetch(`${API}/register`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ correo, contraseña })
+        body: JSON.stringify({
+          id_rol: 2,
+          correo,
+          contraseña,
+          estado: 'activo',
+          fecha_registro: new Date()
+            .toISOString()
+            .slice(0, 19)
+            .replace('T', ' ')
+        })
       });
 
       const datos = await respuesta.json();
 
       if (!respuesta.ok) {
         throw new Error(
-          datos.mensaje || 'No se pudo registrar la cuenta'
+          datos.error || 'No se pudo registrar la cuenta'
         );
       }
 
-      // Confirmar el registro y limpiar los campos
-      setMensaje('Cuenta creada correctamente. Ahora puedes iniciar sesión.');
-      setCorreo('');
-      setContraseña('');
+      // Registro exitoso: redirigir automáticamente al Login
+      navigate('/login', { replace: true });
 
     } catch (err) {
       setError(
@@ -100,8 +106,9 @@ function RegisterPage() {
 
         </form>
 
-        {mensaje && <p className="auth-success">{mensaje}</p>}
-        {error && <p className="auth-error">{error}</p>}
+        {error && (
+          <p className="auth-error">{error}</p>
+        )}
 
         <div className="auth-footer">
           <p>¿Ya tienes una cuenta?</p>
