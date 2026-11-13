@@ -1,7 +1,11 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router';
+import axios from 'axios';
 import '../Detailspage.css';
+
+const API = 'http://localhost:3001/ecommer';
+
 function DetailsPage() {
   const [searchParams] = useSearchParams();
   const id_producto = searchParams.get('id_producto');
@@ -11,38 +15,82 @@ function DetailsPage() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [mensajeCarrito, setMensajeCarrito] = useState('');
+  const [imagenFallida, setImagenFallida] = useState(false);
 
+  // Obtener los detalles del producto desde el backend
   useEffect(() => {
-    if (!id_producto) {
+    if (!id_producto || id_producto === 'undefined') {
+      setProducto(null);
       setError('No se seleccionó ningún producto.');
       setCargando(false);
       return;
     }
 
-    setCargando(true);
-    setError('');
-    setProducto(null);
-    setCantidad(1);
+    const controller = new AbortController();
 
-    fetch(`http://localhost:3001/ecommer/details?id_producto=${id_producto}`)
-      .then((respuesta) => {
-        if (!respuesta.ok) {
-          throw new Error('No se pudo obtener el producto.');
+    const obtenerDetalles = async () => {
+      setCargando(true);
+      setError('');
+      setProducto(null);
+      setCantidad(1);
+      setMensajeCarrito('');
+      setImagenFallida(false);
+
+      try {
+        const respuesta = await axios.get(`${API}/details`, {
+          params: { id_producto },
+          signal: controller.signal
+        });
+
+        // El backend devuelve un arreglo de productos
+        const datos = respuesta.data;
+        const resultado = datos?.producto ?? datos;
+
+        const productoEncontrado = Array.isArray(resultado)
+          ? resultado[0]
+          : resultado;
+
+        if (!productoEncontrado) {
+          throw new Error('Producto no encontrado.');
         }
-        return respuesta.json();
-      })
-      .then((datos) => {
-        const resultado = datos.producto ?? datos;
-        setProducto(Array.isArray(resultado) ? resultado[0] : resultado);
-      })
-      .catch(() => {
-        setError('El servicio de detalles aún no está disponible.');
-      })
-      .finally(() => {
-        setCargando(false);
-      });
+
+        setProducto(productoEncontrado);
+
+      } catch (err) {
+        if (axios.isCancel(err)) return;
+
+        console.error(
+          'Error al obtener detalles:',
+          err.response?.data ?? err
+        );
+
+        setError(
+          err.response?.data?.message ||
+          err.message ||
+          'No se pudieron cargar los detalles.'
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setCargando(false);
+        }
+      }
+    };
+
+    obtenerDetalles();
+
+    return () => controller.abort();
   }, [id_producto]);
 
+  // Formatear precios a dos decimales
+  const formatearPrecio = (valor) => {
+    if (valor == null || !Number.isFinite(Number(valor))) {
+      return 'Precio por consultar';
+    }
+
+    return `S/ ${Number(valor).toFixed(2)}`;
+  };
+
+  // Verificar promociones
   const tieneDescuento = Number(producto?.Descuento) === 1;
 
   const precioMostrar =
@@ -50,34 +98,49 @@ function DetailsPage() {
       ? producto.precio_final
       : producto?.precio;
 
-  const stock = producto?.stock ?? producto?.stock_disponible;
+  // Stock provisional hasta recibir las variantes
+  const stock = producto?.stock_disponible ?? producto?.stock;
 
+  // Obtener la URL de la imagen
+  const obtenerImagen = (ruta) => {
+    if (!ruta) return null;
+
+    if (/^https?:\/\//i.test(ruta)) {
+      return ruta;
+    }
+
+    return `http://localhost:3001/${ruta.replace(/^\/+/, '')}`;
+  };
+
+  const imagen = obtenerImagen(producto?.imagen_url);
+
+  // Controlar la cantidad
   const aumentarCantidad = () => {
     if (stock == null || cantidad < Number(stock)) {
-      setCantidad(cantidad + 1);
+      setCantidad((anterior) => anterior + 1);
     }
   };
 
   const disminuirCantidad = () => {
     if (cantidad > 1) {
-      setCantidad(cantidad - 1);
+      setCantidad((anterior) => anterior - 1);
     }
   };
 
+  // Carrito provisional solicitado en el ticket
   const agregarAlCarrito = () => {
     if (!producto || !id_producto) {
-      setMensajeCarrito('El producto todavía no está disponible.');
+      setMensajeCarrito('Producto no disponible.');
       return;
     }
 
-    // Aquí conectaremos el carrito cuando exista su endpoint.
     console.log('Producto para carrito:', {
-      id_producto,
+      id_producto: Number(id_producto),
       cantidad
     });
 
     setMensajeCarrito(
-      'Producto seleccionado. Falta conectar el servicio del carrito.'
+      'Producto seleccionado. Carrito pendiente de conexión.'
     );
   };
 
@@ -102,81 +165,122 @@ function DetailsPage() {
         </Link>
 
         {cargando && <p>Cargando producto...</p>}
-        {error && <p className="details-error">{error}</p>}
 
-        <div className="details-container">
-          <section className="details-image">
-            <div className="details-image-placeholder">
-              Imagen del producto
-            </div>
-          </section>
+        {error && (
+          <p className="details-error">{error}</p>
+        )}
 
-          <section className="details-info">
-            <h1>{producto?.nombre ?? 'Nombre del producto'}</h1>
+        {!cargando && producto && (
+          <div className="details-container">
 
-            {tieneDescuento && (
-              <span className="details-descuento">
-                ¡Producto en oferta!
-              </span>
-            )}
+            <section className="details-image">
+              {imagen && !imagenFallida ? (
+                <img
+                  src={imagen}
+                  alt={producto.nombre}
+                  className="details-product-image"
+                  onError={() => setImagenFallida(true)}
+                />
+              ) : (
+                <div className="details-image-placeholder">
+                  Imagen no disponible
+                </div>
+              )}
+            </section>
 
-            <div className="details-precios">
-              {tieneDescuento && producto?.precio_final != null && (
-                <span className="details-precio-original">
-                  S/ {producto.precio}
+            <section className="details-info">
+              <h1>{producto.nombre}</h1>
+
+              <p>
+                <strong>Marca:</strong> {producto.marca}
+              </p>
+
+              <p>
+                <strong>Categoría:</strong> {producto.categoria}
+              </p>
+
+              <p>
+                <strong>Subcategoría:</strong> {producto.subcategoria}
+              </p>
+
+              <p>
+                <strong>Género:</strong> {producto.genero}
+              </p>
+
+              {tieneDescuento && (
+                <span className="details-descuento">
+                  ¡Producto en oferta!
                 </span>
               )}
 
-              <span className="details-precio">
-                {precioMostrar != null
-                  ? `S/ ${precioMostrar}`
-                  : 'Precio por consultar'}
-              </span>
-            </div>
+              <div className="details-precios">
+                {tieneDescuento && (
+                  <span className="details-precio-original">
+                    {formatearPrecio(producto.precio)}
+                  </span>
+                )}
 
-            <p className="details-descripcion">
-              {producto?.descripcion ??
-                'Aquí aparecerá la descripción del producto.'}
-            </p>
-
-            {stock != null && (
-              <span className="details-stock">
-                Stock: {stock}
-              </span>
-            )}
-
-            <div className="details-cantidad">
-              <label>Cantidad</label>
-
-              <div className="details-cantidad-control">
-                <button onClick={disminuirCantidad} disabled={cantidad <= 1}>
-                  −
-                </button>
-
-                <span>{cantidad}</span>
-
-                <button
-                  onClick={aumentarCantidad}
-                  disabled={!producto || (stock != null && Number(stock) <= 0)}
-                >
-                  +
-                </button>
+                <span className="details-precio">
+                  {formatearPrecio(precioMostrar)}
+                </span>
               </div>
-            </div>
 
-            <button
-              className="details-btn-carrito"
-              onClick={agregarAlCarrito}
-              disabled={stock != null && Number(stock) <= 0}
-            >
-              Agregar al carrito
-            </button>
+              <p className="details-descripcion">
+                {producto.descripcion}
+              </p>
 
-            {mensajeCarrito && (
-              <p className="details-mensaje">{mensajeCarrito}</p>
-            )}
-          </section>
-        </div>
+              {stock != null && (
+                <span className="details-stock">
+                  Stock disponible: {stock}
+                </span>
+              )}
+
+              <div className="details-cantidad">
+                <label>Cantidad</label>
+
+                <div className="details-cantidad-control">
+                  <button
+                    type="button"
+                    onClick={disminuirCantidad}
+                    disabled={cantidad <= 1}
+                  >
+                    −
+                  </button>
+
+                  <span>{cantidad}</span>
+
+                  <button
+                    type="button"
+                    onClick={aumentarCantidad}
+                    disabled={
+                      stock != null &&
+                      cantidad >= Number(stock)
+                    }
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="details-btn-carrito"
+                onClick={agregarAlCarrito}
+                disabled={
+                  stock != null && Number(stock) <= 0
+                }
+              >
+                Agregar al carrito
+              </button>
+
+              {mensajeCarrito && (
+                <p className="details-mensaje">
+                  {mensajeCarrito}
+                </p>
+              )}
+            </section>
+          </div>
+        )}
       </main>
     </>
   );

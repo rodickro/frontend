@@ -116,7 +116,7 @@ function PrincipalPage() {
               productos.map((producto, index) => (
                 <div
                   className="product-card"
-                  key={producto.id_producto ?? index}
+                  key={producto.idproducto ?? index}
                 >
                   <div className="product-image-placeholder">
                     Imagen
@@ -138,12 +138,13 @@ function PrincipalPage() {
                       Agregar
                     </button>
 
-                   <Link
-                       to={`/details?id_producto=${producto.id_producto}`}
-                       className="btn-detalles"
+                  <Link
+  to={`/details?id_producto=${producto.idproducto}`}
+  className="btn-detalles"
+  onClick={() => console.log('Producto seleccionado:', producto)}
 >
-                       Ver detalles
-                    </Link>
+  Ver detalles
+</Link>
                   </div>
                 </div>
               ))
