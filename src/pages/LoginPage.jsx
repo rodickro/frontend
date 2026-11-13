@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import axios from 'axios';
 import '../Auth.css';
 
 const API = 'http://localhost:3001/ecommer';
@@ -13,36 +14,47 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
 
-  // Enviar las credenciales al backend
   const iniciarSesion = async (e) => {
     e.preventDefault();
+
     setError('');
     setCargando(true);
 
+    const datosLogin = {
+      correo: correo.trim(),
+      contraseña
+    };
+
     try {
-      const respuesta = await fetch(`${API}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ correo, contraseña })
-      });
+      const respuesta = await axios.post(
+        `${API}/login`,
+        datosLogin
+      );
 
-      const datos = await respuesta.json();
+      console.log('Inicio de sesión:', respuesta.data.mensaje);
 
-      if (!respuesta.ok) {
-        throw new Error(datos.mensaje || 'Error al iniciar sesión');
-      }
+      // Guardar el token recibido del backend
+      localStorage.setItem('token', respuesta.data.token);
 
-      // Redirigir a la página principal
-      navigate('/');
+      // Redirigir al catálogo
+      navigate('/', { replace: true });
 
     } catch (err) {
-      setError(
-        err instanceof TypeError
-          ? 'No se pudo conectar con el servidor'
-          : err.message
+      console.error(
+        'Error al iniciar sesión:',
+        err.response?.data ?? err
       );
+
+      if (err.response) {
+        setError(
+          err.response.data?.mensaje ||
+          err.response.data?.error ||
+          'No se pudo iniciar sesión.'
+        );
+      } else {
+        setError('No se pudo conectar con el servidor.');
+      }
+
     } finally {
       setCargando(false);
     }
@@ -66,6 +78,7 @@ function LoginPage() {
               placeholder="ejemplo@correo.com"
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
+              autoComplete="email"
               required
             />
           </div>
@@ -79,6 +92,7 @@ function LoginPage() {
               placeholder="Ingresa tu contraseña"
               value={contraseña}
               onChange={(e) => setContraseña(e.target.value)}
+              autoComplete="current-password"
               required
             />
           </div>
