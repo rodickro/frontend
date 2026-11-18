@@ -3,6 +3,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import PrincipalPage from './pages/PrincipalPage.jsx';
 import DetailsPage from './pages/DetailsPage.jsx';
+import CarritoPage from './pages/CarritoPage.jsx';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/details" element={<DetailsPage />} />
+      <Route path="/carrito" element={<CarritoPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
