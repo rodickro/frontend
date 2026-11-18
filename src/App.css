@@ -86,9 +86,16 @@
   cursor: pointer; flex: 1; font-weight: bold; transition: 0.2s;
 }
 .btn-agregar:hover { background-color: #004a94; }
+
+/* CAMBIO APLICADO AQUÍ */
 .btn-detalles {
   background-color: white; color: #005bb5; border: 1px solid #005bb5; padding: 10px 0; border-radius: 4px;
   cursor: pointer; flex: 1; font-weight: bold; transition: 0.2s;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none; /* Asegura que el Link no tenga subrayado */
 }
 .btn-detalles:hover { background-color: #f0f8ff; }
 

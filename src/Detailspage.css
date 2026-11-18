@@ -64,27 +64,49 @@
   font-size: 17px;
 }
 
-/* Información */
+/* Imagen real cuando exista */
+
+.details-product-image {
+  display: block;
+  width: 100%;
+  height: 430px;
+  object-fit: contain;
+  background-color: #f0f2f5;
+  border: 1px solid #e0e4e9;
+  border-radius: 10px;
+}
+
+/* Información del producto */
 
 .details-info {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
+  gap: 12px;
+}
+
+/* Evitar espacios excesivos entre párrafos */
+
+.details-info > p {
+  margin: 0;
+  line-height: 1.5;
 }
 
 .details-info h1 {
   font-size: 32px;
   font-weight: 700;
   color: #202631;
-  margin: 0;
+  margin: 0 0 8px;
 }
+
+/* Precios */
 
 .details-precios {
   display: flex;
   align-items: center;
   gap: 15px;
   flex-wrap: wrap;
+  margin-top: 8px;
 }
 
 .details-precio {
@@ -99,11 +121,13 @@
   text-decoration: line-through;
 }
 
-.details-descripcion {
+/* Descripción */
+
+.details-info > p.details-descripcion {
   color: #444;
   font-size: 15px;
   line-height: 1.7;
-  margin: 0;
+  margin: 4px 0;
 }
 
 /* Descuento */
@@ -135,6 +159,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: 8px;
 }
 
 .details-cantidad label {
@@ -207,7 +232,7 @@
   margin-bottom: 20px;
 }
 
-.details-mensaje {
+.details-info > p.details-mensaje {
   color: #555;
   font-size: 13px;
 }
@@ -226,6 +251,10 @@
 
   .details-image-placeholder {
     min-height: 300px;
+  }
+
+  .details-product-image {
+    height: 300px;
   }
 
   .details-info h1 {
