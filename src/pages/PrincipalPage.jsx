@@ -12,7 +12,7 @@ function PrincipalPage() {
   const [genero, setGenero] = useState('Todos');
   const [marca, setMarca] = useState('Todos');
   const [talla, setTalla] = useState('Todos');
-
+  const [orden, setOrden] = useState('mas_vendidos');
   const handleAgregarCarrito = () => {
     setCartCount((anterior) => anterior + 1);
   };
@@ -23,6 +23,7 @@ function PrincipalPage() {
     setGenero('Todos');
     setMarca('Todos');
     setTalla('Todos');
+    setOrden('mas_vendidos');
   };
 
   // Obtener los productos desde el backend usando Axios con filtros dinámicos
@@ -34,6 +35,7 @@ function PrincipalPage() {
     if (genero !== 'Todos') queryParams.push(`genero=${genero}`);
     if (marca !== 'Todos') queryParams.push(`marca=${marca}`);
     if (talla !== 'Todos') queryParams.push(`talla=${talla}`);
+    if (orden) queryParams.push(`orden=${orden}`);
 
     if (queryParams.length > 0) {
       url += `?${queryParams.join('&')}`;
@@ -42,7 +44,7 @@ function PrincipalPage() {
     axios.get(url)
       .then((res) => setProductos(res.data))
       .catch((error) => console.error('Error al traer productos:', error));
-  }, [categoria, genero, marca, talla]);
+  }, [categoria, genero, marca, talla, orden]);
 
   return (
     <>
@@ -180,11 +182,11 @@ function PrincipalPage() {
             </div>
             <div className="sort-by">
               <label>Ordenar por: </label>
-              <select>
-                <option>Más vendidos</option>
-                <option>Precio: menor a mayor</option>
-                <option>Precio: mayor a menor</option>
-                <option>Más recientes</option>
+              <select value={orden} onChange={(e) => setOrden(e.target.value)}>
+                <option value="mas_vendidos">Más vendidos</option>
+                <option value="precio_asc">Precio: menor a mayor</option>
+                <option value="precio_desc">Precio: mayor a menor</option>
+                <option value="mas_recientes">Más recientes</option>
               </select>
             </div>
           </div>
