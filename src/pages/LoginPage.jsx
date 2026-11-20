@@ -31,13 +31,23 @@ function LoginPage() {
       // Enviar las credenciales mediante Axios
       const respuesta = await axios.post(
         `${API}/login`,
-        datosLogin,
-        { withCredentials: true }
+        datosLogin
       );
+
+      // Obtener el token JWT generado por el backend
+      const token = respuesta.data?.token;
+
+      if (!token || typeof token !== 'string') {
+        setError('El servidor no devolvió un token de sesión.');
+        return;
+      }
+
+      // Guardar el token durante la sesión del navegador
+      sessionStorage.setItem('token', token);
 
       console.log('Inicio de sesión:', respuesta.data.mensaje);
 
-      // Redirigir al catálogo si el backend confirma el login
+      // Redirigir al catálogo después de guardar el token
       navigate('/', { replace: true });
 
     } catch (err) {
