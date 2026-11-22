@@ -227,8 +227,11 @@ function DetailsPage() {
           }
         }
       );
-      console.log('ID del cliente:', respuesta.data.id_cliente);
-      console.log('ID del carrito:', respuesta.data.id_carrito);
+      console.log('Información del carrito:', {
+        id_cliente: respuesta.data.id_cliente,
+        id_carrito: respuesta.data.id_carrito,
+        id_reserva: respuesta.data.id_reserva
+      });
 
 
       setMensajeCarrito(
