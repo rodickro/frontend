@@ -28,6 +28,28 @@ function PrincipalPage() {
         setOrden('mas_vendidos'); // TU CAMBIO
     };
 
+    // Obtener la cantidad real de productos en el carrito desde el backend
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setCartCount(0);
+            return;
+        }
+
+        axios.get('http://localhost:3001/ecommer/carrito', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                const productosCarrito = res.data?.productos ?? [];
+                setCartCount(productosCarrito.length);
+            })
+            .catch(() => {
+                setCartCount(0);
+            });
+    }, []);
+
     // Obtener productos desde el backend
     useEffect(() => {
         let url = 'http://localhost:3001/ecommer/principal';
