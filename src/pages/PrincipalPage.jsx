@@ -15,6 +15,10 @@ function PrincipalPage() {
     const [talla, setTalla] = useState('Todos');
     const [orden, setOrden] = useState('mas_vendidos'); // TU CAMBIO
 
+    // TICKET 6: Estados para la barra de búsqueda y sugerencias
+    const [busqueda, setBusqueda] = useState('');
+    const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
+
     const handleAgregarCarrito = () => {
         setCartCount((anterior) => anterior + 1);
     };
@@ -26,7 +30,36 @@ function PrincipalPage() {
         setMarca('Todos');
         setTalla('Todos');
         setOrden('mas_vendidos'); // TU CAMBIO
+        setBusqueda('');
+        setMostrarSugerencias(false);
     };
+
+    // TICKET 6: Normalizar texto (quita tildes y pasa a minúsculas)
+    const normalizarTexto = (texto = '') => {
+        return texto
+            .toString()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    };
+
+    // TICKET 6: Algoritmo de búsqueda con prioridad por prefijo
+    const terminoNormalizado = normalizarTexto(busqueda);
+
+    const productosFiltrados = terminoNormalizado === ''
+        ? productos
+        : productos
+            .filter((producto) =>
+                normalizarTexto(producto.nombre).includes(terminoNormalizado)
+            )
+            .sort((a, b) => {
+                const nombreA = normalizarTexto(a.nombre);
+                const nombreB = normalizarTexto(b.nombre);
+                const empiezaA = nombreA.startsWith(terminoNormalizado) ? 0 : 1;
+                const empiezaB = nombreB.startsWith(terminoNormalizado) ? 0 : 1;
+                return empiezaA - empiezaB;
+            });
 
     // Obtener la cantidad real de productos en el carrito desde el backend
     useEffect(() => {
@@ -75,7 +108,7 @@ function PrincipalPage() {
             });
 
     // TU CAMBIO (Se añadió orden a las dependencias)
-    }, [categoria, genero, marca, talla, orden]); 
+    }, [categoria, genero, marca, talla, orden]);
 
     return (
         <>
@@ -83,13 +116,51 @@ function PrincipalPage() {
                 <div className="navbar-brand">
                     MiTienda
                 </div>
-                <div>
+
+                {/* TICKET 6: Barra de búsqueda con sugerencias en tiempo real */}
+                <div className="search-container">
                     <input
                         type="text"
                         className="search-bar"
                         placeholder="Buscar productos..."
+                        value={busqueda}
+                        onChange={(e) => {
+                            setBusqueda(e.target.value);
+                            setMostrarSugerencias(true);
+                        }}
+                        onFocus={() => {
+                            if (busqueda.trim() !== '') {
+                                setMostrarSugerencias(true);
+                            }
+                        }}
+                        onBlur={() => {
+                            setTimeout(() => setMostrarSugerencias(false), 150);
+                        }}
                     />
+
+                    {mostrarSugerencias && terminoNormalizado !== '' && (
+                        <ul className="search-suggestions">
+                            {productosFiltrados.length > 0 ? (
+                                productosFiltrados.slice(0, 6).map((producto, index) => (
+                                    <li key={producto.id_producto ?? producto.idproducto ?? index}>
+                                        <Link
+                                            to={`/details?id_producto=${producto.id_producto ?? producto.idproducto}`}
+                                            className="search-suggestion-item"
+                                            onClick={() => setMostrarSugerencias(false)}
+                                        >
+                                            <span className="suggestion-name">{producto.nombre}</span>
+                                        </Link>
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="search-no-results">
+                                    No se encontraron productos para "{busqueda}"
+                                </li>
+                            )}
+                        </ul>
+                    )}
                 </div>
+
                 <nav className="nav-links">
                     <a href="#">Contacto</a>
                     <a href="#">Términos</a>
@@ -209,12 +280,12 @@ function PrincipalPage() {
                     </div>
 
                     <div className="product-grid">
-                        {productos.length === 0 ? (
+                        {productosFiltrados.length === 0 ? (
                             <p className="no-products-msg">
                                 No hay productos disponibles por el momento.
                             </p>
                         ) : (
-                            productos.map((producto, index) => (
+                            productosFiltrados.map((producto, index) => (
                                 <div
                                     className="product-card"
                                     key={producto.id_producto ?? producto.idproducto ?? index}
